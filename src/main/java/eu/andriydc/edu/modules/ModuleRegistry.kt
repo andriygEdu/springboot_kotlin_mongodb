@@ -11,7 +11,7 @@ import org.springframework.data.repository.Repository
  */
 
 interface ModuleRegistry : Repository<Module, String> {
-    fun findOneByNameIgnoreCase(name: String): Module?
+    fun findOneByNameAndProjectNameAllIgnoreCase(name: String, projectName: String): Module?
 
     fun save(module: Module): Module
 

@@ -4,6 +4,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
+import java.util.*
 import javax.annotation.PostConstruct
 
 /**
@@ -22,7 +23,14 @@ constructor(
         get() = moduleRegistry.findAll().toTypedArray()
 
     override fun createOrUpdateModule(projectName: String, moduleName: String): Module {
-        throw UnsupportedOperationException()
+        val module = getOrCreateModule(projectName, moduleName)
+        module.updateDate = Date()
+        moduleRegistry.save(module)
+        return module
+    }
+
+    override fun getOrCreateModule(name: String): Module {
+        return getOrCreateModule(noneProject.name, name)
     }
 
     override val noneProject: Project by lazy {
@@ -44,19 +52,21 @@ constructor(
         }
     }
 
-    override fun getOrCreateModule(name: String): Module {
-        var module = moduleRegistry.findOneByNameIgnoreCase(name)
-        if (module != null) {
-            return module
-        } else {
-            module = Module(name = name, projectName = noneProject.name)
+    override fun getOrCreateModule(projectName: String, name: String): Module {
+       return getOrCreateModule(getOrCreateProject(projectName), name)
+    }
+
+    fun getOrCreateModule(project: Project, name: String): Module {
+        return moduleRegistry.findOneByNameAndProjectNameAllIgnoreCase(name, projectName = project.name) ?:
+         run {
+            val module = Module(name = name, projectName = project.name)
             moduleRegistry.save(module)
             return module
         }
     }
 
-    override fun getModule(module_name: String): Module? {
-        return moduleRegistry.findOneByNameIgnoreCase(module_name)
+    override fun getModule(module_name: String, project: Project): Module? {
+        return moduleRegistry.findOneByNameAndProjectNameAllIgnoreCase(module_name, projectName = project.name)
     }
 
     private val logger: Logger by lazy {

@@ -9,7 +9,7 @@ interface ModuleService {
     val noneModule: Module
     fun getOrCreateProject(name: String): Project
     fun getOrCreateModule(name: String): Module
-    fun getModule(module_name: String): Module?
+    fun getModule(module_name: String, project: Project): Module?
 
     val modules: Array<Module>
 
@@ -17,4 +17,5 @@ interface ModuleService {
 
     val buildEnvironmentConfiguration: BuildEnvironmentConfiguration
     open fun setBuildEnvironmentConfiguration(emailSender: String, incrementalNotificationEmail: String): BuildEnvironmentConfiguration
+    fun getOrCreateModule(projectName: String, name: String): Module
 }
